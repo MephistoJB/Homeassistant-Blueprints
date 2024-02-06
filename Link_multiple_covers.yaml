@@ -1,6 +1,6 @@
 blueprint:
   name: Link Multiple Covers
-  description: Link multiple covers together v1.0.0 based on aderushas link_multiple_switches
+  description: Link multiple covers
   domain: automation
   homeassistant:
     min_version: 2022.5.0
@@ -17,11 +17,11 @@ mode: queued
 max_exceeded: silent
 
 variables:
-  covers: !input 'cover'
+  covers: !input 'covers'
   
 trigger:
   - platform: state
-    entity_id: !input 'cover'
+    entity_id: !input 'covers'
 
 condition:
   - condition: template
