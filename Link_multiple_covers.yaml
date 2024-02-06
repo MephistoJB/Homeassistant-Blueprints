@@ -17,11 +17,11 @@ mode: queued
 max_exceeded: silent
 
 variables:
-  covers: !input 'covers'
+  covers: !input 'cover'
   
 trigger:
   - platform: state
-    entity_id: !input 'covers'
+    entity_id: !input 'cover'
 
 condition:
   - condition: template
