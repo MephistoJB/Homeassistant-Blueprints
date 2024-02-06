@@ -17,7 +17,7 @@ mode: queued
 max_exceeded: silent
 
 variables:
-  covers: !input 'covers'
+  cov: !input 'covers'
   
 trigger:
   - platform: state
@@ -34,5 +34,5 @@ condition:
 action:
   - service: cover.{{ trigger.to_state.state | replace("ing", "")}}_cover
     target:
-      entity_id: '{{ expand(covers) | selectattr("entity_id", "!=", trigger.entity_id)
+      entity_id: '{{ expand(cov) | selectattr("entity_id", "!=", trigger.entity_id)
         | map(attribute="entity_id") | list }}'
