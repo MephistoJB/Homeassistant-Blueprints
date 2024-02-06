@@ -12,13 +12,17 @@ blueprint:
           domain: cover
           multiple: true
   source_url: https://github.com/MephistoJB/Homeassistant-Blueprints/blob/main/Link_multiple_covers_together.yaml
-variables:
-  covers: covers
-trigger:
-  - platform: state
-    entity_id: covers
+
 mode: queued
 max_exceeded: silent
+
+variables:
+  covers: !input 'covers'
+  
+trigger:
+  - platform: state
+    entity_id: !input 'covers'
+
 condition:
   - condition: template
     value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
@@ -26,6 +30,7 @@ condition:
     value_template: "{{ trigger.to_state.context.parent_id is none
       or  (trigger.to_state.context.id != this.context.id
       and  trigger.to_state.context.parent_id  != this.context.id) }}"
+      
 action:
   - service: cover.{{ trigger.to_state.state }}_cover
     target:
