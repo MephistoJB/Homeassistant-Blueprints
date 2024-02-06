@@ -32,7 +32,7 @@ condition:
       and  trigger.to_state.context.parent_id  != this.context.id) }}"
       
 action:
-  - service: cover.{{ trigger.to_state.state }}_cover
+  - service: cover.{{ trigger.to_state.state | replace("ing", "")}}_cover
     target:
       entity_id: '{{ expand(covers) | selectattr("entity_id", "!=", trigger.entity_id)
         | map(attribute="entity_id") | list }}'
