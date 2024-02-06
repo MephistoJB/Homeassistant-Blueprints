@@ -1,4 +1,3 @@
----
 blueprint:
   name: Link Multiple Covers
   description: Link multiple covers together v1.0.0 based on aderushas link_multiple_switches
