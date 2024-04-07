@@ -181,9 +181,9 @@ action:
     target:
       entity_id: !input 'tuyaCoverLight'
     continue_on_error: true
-  #- service: automation.trigger
-  #  metadata: {}
-  #  data:
-  #    skip_condition: true
-  #  target:
-  #    entity_id: !input 'checkAutomation'
+  # - service: automation.trigger
+  #   metadata: {}
+  #   data:
+  #     skip_condition: true
+  #   target:
+  #     entity_id: !input 'checkAutomation'
