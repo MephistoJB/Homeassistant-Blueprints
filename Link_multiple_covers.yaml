@@ -26,13 +26,13 @@ blueprint:
           integration: loxone
           domain: cover
           multiple: false
-    checkAutomation:
-      name: Überprüfungsautomation
+    #checkAutomation:
+    #  name: Überprüfungsautomation
       #selector:
       #  entity:
       #    domain: automation
       #    multiple: false
-    source_url: https://github.com/MephistoJB/Homeassistant-Blueprints/blob/main/Link_multiple_covers_together.yaml
+    #source_url: https://github.com/MephistoJB/Homeassistant-Blueprints/blob/main/Link_multiple_covers_together.yaml
 mode: parallel
 max: 100
 max_exceeded: silent
