@@ -26,8 +26,8 @@ blueprint:
           integration: loxone
           domain: cover
           multiple: false
-    #checkAutomation:
-    #  name: Überprüfungsautomation
+    checkAutomation:
+      name: Überprüfungsautomation
       #selector:
       #  entity:
       #    domain: automation
