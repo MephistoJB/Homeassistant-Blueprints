@@ -28,10 +28,10 @@ blueprint:
           multiple: false
     checkAutomation:
       name: Überprüfungsautomation
-      #selector:
-      #  entity:
-      #    domain: automation
-      #    multiple: false
+      selector:
+        entity:
+          domain: automation
+          multiple: false
     #source_url: https://github.com/MephistoJB/Homeassistant-Blueprints/blob/main/Link_multiple_covers_together.yaml
 mode: parallel
 max: 100
