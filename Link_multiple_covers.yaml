@@ -26,12 +26,12 @@ blueprint:
           integration: loxone
           domain: cover
           multiple: false
-    checkAutomation:
-      name: Überprüfungsautomation
-      selector:
-        entity:
-          domain: automation
-          multiple: false
+    # checkAutomation:
+    #  name: Überprüfungsautomation
+    #  selector:
+    #    entity:
+    #      domain: automation
+    #      multiple: false
     #source_url: https://github.com/MephistoJB/Homeassistant-Blueprints/blob/main/Link_multiple_covers_together.yaml
 mode: parallel
 max: 100
@@ -181,9 +181,9 @@ action:
     target:
       entity_id: !input 'tuyaCoverLight'
     continue_on_error: true
-  - service: automation.trigger
-    metadata: {}
-    data:
-      skip_condition: true
-    target:
-      entity_id: !input 'checkAutomation'
+  #- service: automation.trigger
+  #  metadata: {}
+  #  data:
+  #    skip_condition: true
+  #  target:
+  #    entity_id: !input 'checkAutomation'
