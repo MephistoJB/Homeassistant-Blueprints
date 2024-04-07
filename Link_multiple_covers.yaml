@@ -1,38 +1,189 @@
 blueprint:
   name: Link Multiple Covers
-  description: Link multiple covers
+  description: Link Tuya and Loxone Covers
   domain: automation
   homeassistant:
     min_version: 2022.5.0
   input:
-    covers:
-      name: Covers Entites
+    tuyaCover:
+      name: Tuya Cover
       selector:
         entity:
+          integration: localtuya
           domain: cover
-          multiple: true
-  source_url: https://github.com/MephistoJB/Homeassistant-Blueprints/blob/main/Link_multiple_covers_together.yaml
-
-mode: queued
+          multiple: false
+    tuyaCoverLight:
+      name: Tuya Cover Background Light
+      selector:
+        entity:
+          integration: localtuya
+          domain: light
+          multiple: false
+    loxCover:
+      name: Loxone Cover
+      selector:
+        entity:
+          integration: loxone
+          domain: cover
+          multiple: false
+    checkAutomation:
+      name: Überprüfungsautomation
+      #selector:
+      #  entity:
+      #    domain: automation
+      #    multiple: false
+    source_url: https://github.com/MephistoJB/Homeassistant-Blueprints/blob/main/Link_multiple_covers_together.yaml
+mode: parallel
+max: 100
 max_exceeded: silent
 
 variables:
-  cov: !input 'covers'
+  tuyaCover: !input 'tuyaCover'
+  loxCover: !input 'loxCover'
+  tuyaCoverLight: !input 'tuyaCoverLight'
   
 trigger:
   - platform: state
-    entity_id: !input 'covers'
+    entity_id: !input 'loxCover'
+    to: opening
+    id: Loxone_Open
+  - platform: state
+    entity_id: !input 'loxCover'
+    to: closing
+    id: Loxone_Close
+  - platform: state
+    entity_id: !input 'tuyaCover'
+    to: opening
+    id: Tuya_open
+  - platform: state
+    entity_id: !input 'tuyaCover'
+    to: closing
+    id: Tuya_Close
 
 condition:
-  - condition: template
-    value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
-  - condition: template
-    value_template: "{{ trigger.to_state.context.parent_id is none
-      or  (trigger.to_state.context.id != this.context.id
-      and  trigger.to_state.context.parent_id  != this.context.id) }}"
+  - condition: state
+    entity_id: !input 'tuyaCoverLight'
+    state: "on"
       
-#action:
-#  - service: cover.{{ trigger.to_state.state | replace("ing", "")}}_cover
-#    target:
-#      entity_id: '{{ expand(cov) | selectattr("entity_id", "!=", trigger.entity_id)
-#        | map(attribute="entity_id") | list }}'
+action:
+  - service: light.turn_off
+    continue_on_error: true
+    metadata: {}
+    data: {}
+    target:
+      entity_id: !input 'tuyaCoverLight'
+  - wait_for_trigger:
+      - platform: state
+        entity_id: !input 'tuyaCoverLight'
+        to: "off"
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - Loxone_Open
+        sequence:
+          - service: cover.open_cover
+            target:
+              entity_id: !input 'tuyaCover'
+            data: {}
+            continue_on_error: true
+      - conditions:
+          - condition: trigger
+            id:
+              - Loxone_Close
+        sequence:
+          - service: cover.close_cover
+            target:
+              entity_id: !input 'tuyaCover'
+            data: {}
+            continue_on_error: true
+      - conditions:
+          - condition: trigger
+            id:
+              - Tuya_open
+        sequence:
+          - service: cover.open_cover
+            target:
+              entity_id: !input 'loxCover'
+            data: {}
+            continue_on_error: true
+      - conditions:
+          - condition: trigger
+            id:
+              - Tuya_Close
+        sequence:
+          - service: cover.close_cover
+            target:
+              entity_id: !input 'loxCover'
+            data: {}
+            continue_on_error: true
+    continue_on_error: true
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - Loxone_Open
+              - Loxone_Close
+        sequence:
+          - wait_for_trigger:
+              - platform: state
+                entity_id: !input 'loxCover'
+                to: open
+              - platform: state
+                entity_id: !input 'loxCover'
+                to: closed
+            timeout:
+              hours: 0
+              minutes: 0
+              seconds: 30
+              milliseconds: 0
+            continue_on_error: true
+          - service: cover.set_cover_position
+            metadata: {}
+            data:
+              position: "{{ state_attr(loxCover, 'current_position') | int}}"
+            continue_on_error: true
+            target:
+              entity_id: !input 'tuyaCover'
+      - conditions:
+          - condition: trigger
+            id:
+              - Tuya_open
+              - Tuya_Close
+        sequence:
+          - wait_for_trigger:
+              - platform: state
+                entity_id: !input 'tuyaCover'
+                to: stop
+                attribute: raw_state
+            timeout:
+              hours: 0
+              minutes: 0
+              seconds: 30
+              milliseconds: 0
+            continue_on_error: true
+          - service: cover.set_cover_position
+            metadata: {}
+            data:
+              position: "{{ state_attr(tuyaCover,'current_position') | int}}"
+            target:
+              entity_id: !input 'loxCover'
+            continue_on_error: true
+    continue_on_error: true
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+  - service: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: !input 'tuyaCoverLight'
+    continue_on_error: true
+  - service: automation.trigger
+    metadata: {}
+    data:
+      skip_condition: true
+    target:
+      entity_id: !input 'checkAutomation'
