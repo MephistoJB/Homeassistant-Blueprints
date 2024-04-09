@@ -182,7 +182,7 @@ action:
       entity_id: !input 'tuyaCoverLight'
     continue_on_error: true
   - service: automation.trigger
-      metadata: {}
+      #metadata: {}
       data:
         skip_condition: true
       target:
